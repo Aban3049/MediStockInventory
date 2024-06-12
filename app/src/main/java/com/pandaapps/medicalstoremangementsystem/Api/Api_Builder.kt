@@ -1,5 +1,6 @@
 package com.pandaapps.medicalstoremangementsystem.Api
 
+import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -22,7 +23,7 @@ interface Api_Builder {
         @Field("phone") phone: String,
         @Field("pincode") pinCode: String
 
-    ): UserCreateResponse
+    ): Response<UserCreateResponse>
 
     companion object {
         const val BASE_URL = "http://muhammadaban.pythonanywhere.com"

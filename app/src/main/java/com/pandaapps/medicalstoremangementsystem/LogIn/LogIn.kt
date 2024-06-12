@@ -20,10 +20,13 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,13 +48,11 @@ import com.pandaapps.medicalstoremangementsystem.R
 
 fun LogIn() {
 
-    val (email, onEmailChange) = remember {
-        mutableStateOf("")
-    }
+    var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
 
-    val (password, onPasswordChange) = remember {
-        mutableStateOf("")
-    }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
 
     val customFontFamily = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         FontFamily(
@@ -100,21 +101,23 @@ fun LogIn() {
 
         TextField(
             value = email,
-            onValueChange = onEmailChange,
+            onValueChange = { email = it },
             labelText = "Email",
             leadingIcon = Icons.Default.Email,
-            keyboardType = KeyboardType.Email
+            keyboardType = KeyboardType.Email,
+            error = emailError
         )
 
         Spacer(modifier = Modifier.height(spacing + 2.dp))
 
         TextField(
             value = password,
-            onValueChange = onPasswordChange,
+            onValueChange = { password = it },
             labelText = "Password",
             leadingIcon = Icons.Default.Lock,
             keyboardType = KeyboardType.Password,
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            error = passwordError
         )
 
         Spacer(modifier = Modifier.height(spacing + 9.dp))
@@ -123,7 +126,25 @@ fun LogIn() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            onClick = {},
+            onClick = {
+
+                var hasError = false
+
+                if (password.isBlank()) {
+                    passwordError = "Password cannot be empty"
+                    hasError = true
+                } else {
+                    passwordError = null
+                }
+
+                if (email.isBlank()) {
+                    emailError = "Email cannot be empty"
+                    hasError = true
+                } else {
+                    emailError = null
+                }
+
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
             shape = RoundedCornerShape(10.dp)
         ) {
@@ -132,11 +153,11 @@ fun LogIn() {
 
         Spacer(modifier = Modifier.height(spacing + 6.dp))
 
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
-        ){
+        ) {
             Text(text = "Don't have an account?")
 
             Text(text = " Sign Up")
