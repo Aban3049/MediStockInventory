@@ -70,5 +70,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.compose.animation:animation:1.7.0-beta02")
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("androidx.compose.material:material:1.6.8")
 
 }
