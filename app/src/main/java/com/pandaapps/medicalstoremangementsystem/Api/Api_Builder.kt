@@ -9,9 +9,6 @@ import retrofit2.http.POST
 interface Api_Builder {
 
 
-    @GET("/getAllUsers")
-    suspend fun getAllUser(): UserTest
-
     @FormUrlEncoded
     @POST("/createUser")
     suspend fun createUser(
@@ -24,6 +21,16 @@ interface Api_Builder {
         @Field("pincode") pinCode: String
 
     ): Response<UserCreateResponse>
+
+    @GET("/getAllProducts")
+    suspend fun getAllProducts(): ProductResponse
+
+    @FormUrlEncoded
+    @POST("/login")
+    suspend fun loginUser(
+        @Field("email") email: String,
+        @Field("password") password: String
+    ): Response<loginResponse>
 
     companion object {
         const val BASE_URL = "http://muhammadaban.pythonanywhere.com"

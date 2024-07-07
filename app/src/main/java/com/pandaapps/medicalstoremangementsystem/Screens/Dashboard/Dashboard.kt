@@ -1,10 +1,9 @@
-package com.pandaapps.medicalstoremangementsystem.Moderen
+package com.pandaapps.medicalstoremangementsystem.Screens.Dashboard
 
-import android.view.RoundedCorner
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,39 +12,34 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
+import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
 import com.pandaapps.medicalstoremangementsystem.R
 
 
-@Preview
-@Composable
-fun Dashboard() {
 
+@Composable
+fun Dashboard(nacController:NavController) {
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -101,7 +95,7 @@ fun Dashboard() {
                     Text(text = "Hello", color = Color.White, fontSize = 18.sp)
 
                     Text(
-                        text = "Muahmmad Aban",
+                        text = "Muhammad Aban",
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
@@ -137,7 +131,7 @@ fun Dashboard() {
 
                 Column(
                     modifier = Modifier
-                        .padding(top = 12.dp, end = 12.dp, bottom = 12.dp)
+                        .padding(start = 8.dp, top = 12.dp, end = 12.dp, bottom = 12.dp)
                         .height(90.dp)
                         .width(90.dp)
                         .background(
@@ -198,7 +192,7 @@ fun Dashboard() {
 
                 Column(
                     modifier = Modifier
-                        .padding(top = 12.dp, bottom = 12.dp, start = 8.dp)
+                        .padding(top = 12.dp, bottom = 12.dp, start = 8.dp, end = 8.dp)
                         .height(90.dp)
                         .width(90.dp)
                         .background(
@@ -230,89 +224,8 @@ fun Dashboard() {
         }
 
 
-        var text by rememberSaveable {
-            mutableStateOf("")
-        }
-
-        TextField(value = text, onValueChange = { text = it }, label = {
-            Text(text = "Searching for.....")
-        }, trailingIcon = {
-            Image(
-                painter = painterResource(id = R.drawable.search_icon),
-                contentDescription = null, modifier = Modifier
-                    .size(43.dp)
-                    .padding(end = 6.dp)
-            )
-        }, shape = RoundedCornerShape(50.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color.White,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                textColor = Color(android.graphics.Color.parseColor("#5e5e5e")),
-                unfocusedLabelColor = Color(android.graphics.Color.parseColor("#5e5e5e"))
-
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, end = 24.dp, start = 24.dp)
-                .shadow(3.dp, shape = RoundedCornerShape(50.dp))
-                .background(Color.White, CircleShape)
-
-        )
-
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, end = 24.dp, start = 24.dp)
-                .shadow(3.dp, shape = RoundedCornerShape(25.dp))
-                .height(145.dp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color(android.graphics.Color.parseColor("#4c6184")),
-                            Color(android.graphics.Color.parseColor("#f9c177"))
-                        )
-                    ),
-                    shape = RoundedCornerShape(25.dp)
-                )
-        ) {
-            val (img, text1, text2) = createRefs()
 
 
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = null,
-                modifier = Modifier.constrainAs(img) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                }
-            )
-
-            Text(text = "To Get Unlimited", fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(top = 32.dp)
-                    .constrainAs(text1) {
-                        top.linkTo(parent.top)
-                        end.linkTo(img.start)
-                        start.linkTo(parent.start)
-                    }
-            )
-
-
-            Text(text = "Upgrade Your Account", fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .constrainAs(text2) {
-                        top.linkTo(text1.bottom)
-                        end.linkTo(text1.end)
-                        start.linkTo(text1.start)
-                    }
-            )
-
-        }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -323,7 +236,11 @@ fun Dashboard() {
 
         ) {
             Column(
-                modifier = Modifier.weight(0.25f),
+                modifier = Modifier.weight(0.25f).clickable {
+                    Toast.makeText(context,"Clicked on OrderPlaced",Toast.LENGTH_SHORT).show()
+                    nacController.navigate(NavScreens.PlaceOrder)
+
+                },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -336,7 +253,7 @@ fun Dashboard() {
                 )
 
                 Text(
-                    text = "inbox",
+                    text = "Place Order",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp),
