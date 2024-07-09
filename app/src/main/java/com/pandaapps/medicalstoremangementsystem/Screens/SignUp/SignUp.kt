@@ -8,10 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
-import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
-import com.pandaapps.medicalstoremangementsystem.Screens.DialogWithImage
 import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
 import com.pandaapps.medicalstoremangementsystem.R
+import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
+import com.pandaapps.medicalstoremangementsystem.Screens.DialogWithImage
 import com.pandaapps.medicalstoremangementsystem.States.State
 import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
 
@@ -78,5 +78,11 @@ fun SignUp(viewModel: ViewModelSignupScreen, navController: NavHostController) {
 
 
 }
+
+
+
+
+
+
 
 

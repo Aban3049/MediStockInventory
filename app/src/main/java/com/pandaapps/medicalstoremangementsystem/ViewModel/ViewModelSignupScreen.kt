@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.pandaapps.medicalstoremangementsystem.Api.ProductResponse
 import com.pandaapps.medicalstoremangementsystem.Api.RetrofitInstance
 import com.pandaapps.medicalstoremangementsystem.States.State
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
@@ -14,12 +17,15 @@ class ViewModelSignupScreen : ViewModel() {
 
     var state = mutableStateOf("")
 
-    var allProducts = mutableStateOf<ProductResponse?>(null)
+    private val _allProducts = MutableStateFlow<List<ProductResponse.ProductResponseItem>>(emptyList())
+    val allProducts: StateFlow<List<ProductResponse.ProductResponseItem>> = _allProducts.asStateFlow()
+
 
     init {
         state.value = State.Default.stateType
         viewModelScope.launch {
-            allProducts.value = RetrofitInstance.api.getAllProducts()
+            val response = RetrofitInstance.api.getAllProducts()
+            _allProducts.value = response // Update the StateFlow with fetched data
         }
 
 
