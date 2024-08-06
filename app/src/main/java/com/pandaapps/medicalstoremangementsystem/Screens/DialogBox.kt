@@ -28,20 +28,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-
-
 fun DialogWithImage(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     painter: Painter,
     imageDescription: String,
+    text: String,
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         // Draw a rectangle shape with rounded corners inside the dialog
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(305.dp)
+                .height(335.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
@@ -59,7 +58,7 @@ fun DialogWithImage(
                         .height(160.dp)
                 )
                 Text(
-                    text = "Failed To Create Account",
+                    text = text,
                     modifier = Modifier.padding(16.dp),
                 )
                 Row(
@@ -71,19 +70,21 @@ fun DialogWithImage(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Try Again")
+                        Text("Cancel")
                     }
                     TextButton(
                         onClick = { onConfirmation() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Cancel")
+                        Text("Try Again")
                     }
                 }
             }
         }
     }
 }
+
+
 
 
 @Composable

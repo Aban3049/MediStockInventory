@@ -11,65 +11,84 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandaapps.medicalstoremangementsystem.Api.ProductResponse
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
+import com.pandaapps.medicalstoremangementsystem.R
+import com.pandaapps.medicalstoremangementsystem.Screens.DialogWithImage
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
 
 
 @Composable
-fun PlaceOrder(viewModel: ViewModelSignupScreen) {
+fun PlaceOrder(viewModel: ViewModel) {
 
-    val allProducts =
-        viewModel.allProducts.collectAsState(initial = emptyList<ProductResponse.ProductResponseItem>())
-
+    val allProducts by viewModel.allProducts.collectAsState(initial = emptyList())
 
     val expanded = rememberSaveable { mutableStateOf(false) }
-    val selectedProduct =
-        rememberSaveable { mutableStateOf<ProductResponse.ProductResponseItem?>(null) }
-    val productQuantity = rememberSaveable { mutableStateOf(0) }
-
-    val productPrice = selectedProduct.value?.price ?: 0.0
-
-    val totalPrice by remember {
-        derivedStateOf { productPrice * productQuantity.value }
+    var selectedProduct by rememberSaveable {
+        mutableStateOf<ProductResponse.ProductResponseItem?>(
+            null
+        )
     }
 
-    Column(modifier = Modifier.padding(10.dp)) {
+    var showReceipt by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
+
+    var productQuantity by rememberSaveable { mutableIntStateOf(0) }
+
+
+    val productPrice = selectedProduct?.price ?: 0.0
+
+
+    var TotalPrice by rememberSaveable {
+       mutableDoubleStateOf(0.0)
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(10.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            backgroundColor = Color(0xFF171717),
-            elevation = 10.dp, shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(Color(0xFF171717)),
+            elevation = CardDefaults.elevatedCardElevation(10.dp), shape = RoundedCornerShape(8.dp),
         ) {
 
             Column(
@@ -158,10 +177,10 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            elevation = 8.dp
+            elevation = CardDefaults.cardElevation(8.dp)
         ) {
             OutlinedTextField(
-                value = selectedProduct.value?.name ?: "---Select Product---",
+                value = selectedProduct?.name ?: "---Select Product---",
                 textStyle = MaterialTheme.typography.titleMedium,
                 onValueChange = {},
                 modifier = Modifier
@@ -179,26 +198,28 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
                     )
                 }
             )
-        }
 
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            allProducts.value.forEach { product ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = product.name!!, style = MaterialTheme.typography.titleMedium)
-                    },
-                    onClick = {
-                        selectedProduct.value = product
-                        expanded.value = false
-                    }
-                )
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                allProducts.forEach { product ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = product.name ?: "Unknown",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        },
+                        onClick = {
+                            selectedProduct = product
+                            expanded.value = false
+                        }
+                    )
+                }
             }
         }
-
 
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -206,11 +227,13 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            elevation = 8.dp
+            elevation = CardDefaults.elevatedCardElevation(8.dp)
         ) {
             OutlinedTextField(
-                value = "Product Quantity: ${productQuantity.value}",
-                onValueChange = { productQuantity.value = it.toIntOrNull() ?: 0 },
+                value = productQuantity.toString(),
+                onValueChange = {
+                    productQuantity = it.toIntOrNull() ?: 0
+                },
                 textStyle = MaterialTheme.typography.titleMedium,
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -219,33 +242,36 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
                         imageVector = Icons.Default.AddCircle,
                         contentDescription = null,
                         modifier = Modifier.clickable {
-                            productQuantity.value++
+                            productQuantity++
                         }
                     )
                 }
             )
         }
 
+
+
         Spacer(modifier = Modifier.height(10.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 12.dp)
+                .padding(start = 10.dp, end = 10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             listOf(50, 100, 150, 200).forEach { quantity ->
                 Card(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .weight(1f), elevation = 8.dp
+                        .weight(1f), elevation = CardDefaults.cardElevation(8.dp)
                 ) {
                     Text(
                         text = quantity.toString(),
                         modifier = Modifier
                             .padding(10.dp)
                             .clickable {
-                                productQuantity.value = quantity
+                                productQuantity = quantity
                             },
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelLarge,
@@ -255,71 +281,52 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
             }
         }
 
-        androidx.compose.material3.Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(8.dp)
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+
+        Button(
+            onClick = {
+                if (selectedProduct != null && productQuantity > 0) {
+                    showReceipt = true
+                    showDialog = false
+                } else {
+                    showReceipt = false
+                    showDialog = true
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         ) {
+            Text(text = "View Receipt")
+        }
 
+        if (showReceipt) {
+            Column(modifier = Modifier.fillMaxWidth()) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Product id:")
-                Text(text = "1")
+                TotalPrice = selectedProduct!!.price!! * productQuantity
+
+                OrderReceipt(
+                    selectedProduct = selectedProduct,
+                    productQuantity = productQuantity,
+                    totalPrice = TotalPrice
+                )
             }
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Stock Quantity Available:")
-                Text(text = "1")
-            }
+        if (showDialog) {
+            DialogWithImage(
+                onDismissRequest = {
+                    showDialog = false
+                },
+                onConfirmation = {
+                    showDialog = false
+                },
+                painter = painterResource(id = R.drawable.angry),
+                imageDescription = "angry",
+                text = "Please select a product and quantity",
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Order Quantity:")
-                Text(text = "100")
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Total Price:")
-                Text(text = "100$")
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "GST:")
-                Text(text = "10%")
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Color.Black)
-                    .padding(top = 4.dp, bottom = 4.dp)
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "$totalPrice",)
-                Text(text = "110$")
-            }
-
-
         }
 
         Button(
@@ -328,21 +335,93 @@ fun PlaceOrder(viewModel: ViewModelSignupScreen) {
                 .padding(10.dp)
                 .clickable {
 
-                }
+                },
+            shape = RoundedCornerShape(12.dp)
         ) {
             Text(text = "Place Order")
         }
 
 
     }
+
 }
 
 
-@Preview(showSystemUi = true)
-@Composable
 
-fun OrderPreview() {
-    PlaceOrder(viewModel = ViewModelSignupScreen())
+
+@Composable
+fun OrderReceipt(
+    selectedProduct: ProductResponse.ProductResponseItem?,
+    productQuantity: Int?,
+    totalPrice: Double
+) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Product id:")
+            Text(text = "${selectedProduct!!.productId ?: 0}")
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Stock Quantity Available:")
+            Text(text = "${selectedProduct!!.stock ?: 0}")
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Order Quantity:")
+            Text(text = "${productQuantity ?: 0}")
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Product Price:")
+            Text(text = "${selectedProduct!!.price ?: 0}")
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "GST:")
+            Text(text = "10%")
+        }
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color.Black)
+                .padding(top = 4.dp, bottom = 4.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Total Price")
+            Text(text = "$totalPrice")
+        }
+
+
+    }
 }
 
 

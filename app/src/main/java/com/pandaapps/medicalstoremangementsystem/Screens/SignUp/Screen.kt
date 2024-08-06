@@ -43,16 +43,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.HeaderText
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextField
 import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
 import com.pandaapps.medicalstoremangementsystem.R
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
 
 
 @Composable
-fun SignUpScreen(viewModel: ViewModelSignupScreen, navController: NavHostController) {
+fun SignUpScreen(viewModel: ViewModel, navController: NavController) {
 
 
     var name by remember { mutableStateOf("") }

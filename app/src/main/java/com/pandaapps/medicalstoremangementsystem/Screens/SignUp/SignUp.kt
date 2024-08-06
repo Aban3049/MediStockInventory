@@ -7,17 +7,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavHostController
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
 import com.pandaapps.medicalstoremangementsystem.R
 import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
 import com.pandaapps.medicalstoremangementsystem.Screens.DialogWithImage
 import com.pandaapps.medicalstoremangementsystem.States.State
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
+
 
 
 @Composable
-fun SignUp(viewModel: ViewModelSignupScreen, navController: NavHostController) {
+fun SignUp(viewModel: ViewModel, navController: NavController) {
 
 
     when (viewModel.state.value) {
@@ -61,7 +63,8 @@ fun SignUp(viewModel: ViewModelSignupScreen, navController: NavHostController) {
                     onDismissRequest = { viewModel.failedSetToDefault() },
                     onConfirmation = { viewModel.state.value = State.Default.stateType },
                     painter = painterResource(id = R.drawable.angry),
-                    imageDescription = "angryEmoji"
+                    imageDescription = "angryEmoji",
+                    "Failed to Create Account",
                 )
             }
 

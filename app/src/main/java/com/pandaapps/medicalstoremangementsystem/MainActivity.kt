@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.pandaapps.medicalstoremangementsystem.Navigation.Navigation
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
 import com.pandaapps.medicalstoremangementsystem.ui.theme.MedicalStoreMangementSystemTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        val viewModel: ViewModelSignupScreen by viewModels()
+        val viewModel: ViewModel by viewModels()
+
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

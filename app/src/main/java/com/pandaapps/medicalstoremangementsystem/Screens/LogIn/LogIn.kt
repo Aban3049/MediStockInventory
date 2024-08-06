@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,23 +41,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.pandaapps.medicalstoremangementsystem.Screens.Components.HeaderText
-import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextField
 import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
 import com.pandaapps.medicalstoremangementsystem.R
+import com.pandaapps.medicalstoremangementsystem.Screens.Components.HeaderText
+import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextField
 import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
 import com.pandaapps.medicalstoremangementsystem.States.State
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelSignupScreen
+import com.pandaapps.medicalstoremangementsystem.ViewModel.UserViewModel
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
+
 
 @Composable
 
-fun LogIn(navController: NavController, viewModel: ViewModelSignupScreen) {
+fun LogIn(
+    navController: NavController,
+    viewModel: ViewModel,
+    userViewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+
 
     var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
 
     var passwordError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
+
+    var isChecked by remember { mutableStateOf(false) }
 
     val customFontFamily = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         FontFamily(
@@ -74,134 +84,158 @@ fun LogIn(navController: NavController, viewModel: ViewModelSignupScreen) {
     val contentPadding = 16.dp
     val spacing = 8.dp
 
-   when(viewModel.state.value){
+    when (viewModel.state.value) {
 
-       State.Default.stateType ->{
-           Column(
-               modifier = Modifier
-                   .padding(contentPadding)
-                   .fillMaxSize()
-                   .verticalScroll(rememberScrollState()),
-               horizontalAlignment = Alignment.CenterHorizontally
-           ) {
+        State.Default.stateType -> {
+            Column(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-               HeaderText(text = "LogIn", fontFamily = customFontFamily, textAlign = TextAlign.Start)
+                HeaderText(
+                    text = "LogIn",
+                    fontFamily = customFontFamily,
+                    textAlign = TextAlign.Start
+                )
 
-               Spacer(modifier = Modifier.height(spacing))
+                Spacer(modifier = Modifier.height(spacing))
 
-               Image(
-                   painterResource(id = R.drawable.assistance),
-                   contentDescription = "Logo Image",
-                   modifier = Modifier.size(150.dp)
-               )
+                Image(
+                    painterResource(id = R.drawable.assistance),
+                    contentDescription = "Logo Image",
+                    modifier = Modifier.size(150.dp)
+                )
 
-               Spacer(modifier = Modifier.height(8.dp + 6.dp))
+                Spacer(modifier = Modifier.height(8.dp + 6.dp))
 
-               Text(
-                   "Welcome To MediStock Manager ",
-                   style = MaterialTheme.typography.headlineLarge,
-                   fontSize = 22.sp,
-                   fontWeight = FontWeight.ExtraBold
-               )
+                Text(
+                    "Welcome To MediStock Manager ",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
 
-               Spacer(modifier = Modifier.height(spacing))
+                Spacer(modifier = Modifier.height(spacing))
 
-               TextField(
-                   value = email,
-                   onValueChange = { email = it },
-                   labelText = "Email",
-                   leadingIcon = Icons.Default.Email,
-                   keyboardType = KeyboardType.Email,
-                   error = emailError
-               )
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    labelText = "Email",
+                    leadingIcon = Icons.Default.Email,
+                    keyboardType = KeyboardType.Email,
+                    error = emailError
+                )
 
-               Spacer(modifier = Modifier.height(spacing + 2.dp))
+                Spacer(modifier = Modifier.height(spacing + 2.dp))
 
-               TextField(
-                   value = password,
-                   onValueChange = { password = it },
-                   labelText = "Password",
-                   leadingIcon = Icons.Default.Lock,
-                   keyboardType = KeyboardType.Password,
-                   visualTransformation = PasswordVisualTransformation(),
-                   error = passwordError
-               )
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    labelText = "Password",
+                    leadingIcon = Icons.Default.Lock,
+                    keyboardType = KeyboardType.Password,
+                    visualTransformation = PasswordVisualTransformation(),
+                    error = passwordError
+                )
 
-               Spacer(modifier = Modifier.height(spacing + 9.dp))
+                Spacer(modifier = Modifier.height(spacing))
 
-               Button(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .height(48.dp),
-                   onClick = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
 
-                       var hasError = false
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = {
+                            isChecked = it
+                            userViewModel.saveUserCredentials(email, password)
+                        }
+                    )
+                    Text(
+                        text = if (isChecked) "Remembered" else "Remember Me",
+                        modifier = Modifier.padding(top = 10.dp, start = 4.dp)
+                    )
 
-                       if (password.isBlank()) {
-                           passwordError = "Password cannot be empty"
-                           hasError = true
-                       } else {
-                           passwordError = null
-                       }
+                }
 
-                       if (email.isBlank()) {
-                           emailError = "Email cannot be empty"
-                           hasError = true
-                       } else {
-                           emailError = null
-                       }
+                Spacer(modifier = Modifier.height(spacing + 9.dp))
 
-                       if (!hasError) {
-                           viewModel.logInUser(email = email, password = password)
-                       }
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    onClick = {
 
-                   },
-                   colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
-                   shape = RoundedCornerShape(10.dp)
-               ) {
-                   Text("LogIn", color = Color.White, fontSize = 17.sp)
-               }
+                        var hasError = false
 
-               Spacer(modifier = Modifier.height(spacing + 6.dp))
+                        if (password.isBlank()) {
+                            passwordError = "Password cannot be empty"
+                            hasError = true
+                        } else {
+                            passwordError = null
+                        }
 
-               Row(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .clickable {
-                           navController.navigate(NavScreens.SignUpHolder)
-                       },
-                   verticalAlignment = Alignment.CenterVertically,
-                   horizontalArrangement = Arrangement.Center
-               ) {
-                   Text(text = "Don't have an account?")
+                        if (email.isBlank()) {
+                            emailError = "Email cannot be empty"
+                            hasError = true
+                        } else {
+                            emailError = null
+                        }
 
-                   Text(text = " Sign Up")
-               }
+                        if (!hasError) {
+                            viewModel.logInUser(email = email, password = password)
 
-           }
-       }
+                        }
 
-       State.LOADING.stateType ->{
-           Column(
-               modifier = Modifier.fillMaxSize(),
-               verticalArrangement = Arrangement.Center,
-               horizontalAlignment = Alignment.CenterHorizontally
-           ) {
-               DialogBoxWithProgressIndicator(text = "Loging In Account ...")
-           }
-       }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("LogIn", color = Color.White, fontSize = 17.sp)
+                }
 
-       State.SUCESS.stateType ->{
-           navController.navigate(NavScreens.HomeHolder)
-       }
+                Spacer(modifier = Modifier.height(spacing + 6.dp))
 
-       State.FAILED.stateType ->{
-           viewModel.failedSetToDefault()
-       }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate(NavScreens.SignUpHolder)
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "Don't have an account?")
+
+                    Text(text = " Sign Up")
+                }
+
+            }
+        }
+
+        State.LOADING.stateType -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DialogBoxWithProgressIndicator(text = "Loging In Account ...")
+            }
+        }
+
+        State.SUCESS.stateType -> {
+            navController.navigate(NavScreens.HomeHolder)
+        }
+
+        State.FAILED.stateType -> {
+            viewModel.failedSetToDefault()
+        }
 
 
-   }
-
+    }
 
 
 }

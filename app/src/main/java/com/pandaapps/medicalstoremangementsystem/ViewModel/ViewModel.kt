@@ -1,11 +1,15 @@
 package com.pandaapps.medicalstoremangementsystem.ViewModel
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pandaapps.medicalstoremangementsystem.Api.ProductResponse
 import com.pandaapps.medicalstoremangementsystem.Api.RetrofitInstance
+import com.pandaapps.medicalstoremangementsystem.DataStore.getUserCredentials
+import com.pandaapps.medicalstoremangementsystem.DataStore.saveUserCredentials
 import com.pandaapps.medicalstoremangementsystem.States.State
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,12 +17,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-class ViewModelSignupScreen : ViewModel() {
+
+
+
+class ViewModel : ViewModel() {
 
     var state = mutableStateOf("")
 
-    private val _allProducts = MutableStateFlow<List<ProductResponse.ProductResponseItem>>(emptyList())
-    val allProducts: StateFlow<List<ProductResponse.ProductResponseItem>> = _allProducts.asStateFlow()
+    private val _allProducts =
+        MutableStateFlow<List<ProductResponse.ProductResponseItem>>(emptyList())
+    val allProducts: StateFlow<List<ProductResponse.ProductResponseItem>> =
+        _allProducts.asStateFlow()
 
 
     init {
@@ -27,7 +36,6 @@ class ViewModelSignupScreen : ViewModel() {
             val response = RetrofitInstance.api.getAllProducts()
             _allProducts.value = response // Update the StateFlow with fetched data
         }
-
 
     }
 
@@ -84,7 +92,10 @@ class ViewModelSignupScreen : ViewModel() {
                 }
             } else {
                 state.value = State.FAILED.stateType
-                Log.d("LogIn", "logInUser: ${result.body()?.status} message :${result.body()?.message} ")
+                Log.d(
+                    "LogIn",
+                    "logInUser: ${result.body()?.status} message :${result.body()?.message} "
+                )
             }
 
         }
