@@ -12,36 +12,36 @@ import com.pandaapps.medicalstoremangementsystem.Screens.Dashboard.Dashboard
 import com.pandaapps.medicalstoremangementsystem.Screens.LogIn.LogIn
 import com.pandaapps.medicalstoremangementsystem.Screens.OrderPlace.PlaceOrder
 import com.pandaapps.medicalstoremangementsystem.Screens.SignUp.SignUp
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun Navigation(viewModel: ViewModel) {
+fun Navigation(viewModelApp: ViewModelApp) {
 
     val navController = rememberNavController()
 
    val startDestination =  if (areCredentialsStored(LocalContext.current)){
-      NavScreens.HomeHolder
+      Routes.HomeHolder
     }else{
-        NavScreens.LoginPageHolder
+        Routes.LoginPageHolder
    }
     NavHost(navController = navController, startDestination = startDestination) {
 
-        composable<NavScreens.SignUpHolder> {
-            SignUp(viewModel = viewModel,navController)
+        composable<Routes.SignUpHolder> {
+            SignUp(viewModelApp = viewModelApp,navController)
         }
 
-        composable<NavScreens.LoginPageHolder> {
-            LogIn(navController,viewModel)
+        composable<Routes.LoginPageHolder> {
+            LogIn(navController,viewModelApp)
         }
 
-        composable<NavScreens.HomeHolder> {
+        composable<Routes.HomeHolder> {
             Dashboard(navController)
         }
 
-        composable<NavScreens.PlaceOrder> {
-            PlaceOrder(viewModel)
+        composable<Routes.PlaceOrder> {
+            PlaceOrder(viewModelApp)
         }
 
 

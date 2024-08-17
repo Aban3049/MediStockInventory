@@ -1,10 +1,13 @@
 package com.pandaapps.medicalstoremangementsystem.Api
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 class ProductResponse : ArrayList<ProductResponse.ProductResponseItem>() {
 
+    @Parcelize
     data class ProductResponseItem(
         @SerializedName("category")
         val category: String?,
@@ -18,6 +21,6 @@ class ProductResponse : ArrayList<ProductResponse.ProductResponseItem>() {
         val productId: Int?,
         @SerializedName("stock")
         val stock: Int?
-    )
+    ): Parcelable
 
 }

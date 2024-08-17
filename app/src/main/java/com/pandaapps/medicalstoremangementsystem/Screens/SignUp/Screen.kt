@@ -46,13 +46,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.HeaderText
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextField
-import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
+import com.pandaapps.medicalstoremangementsystem.Navigation.Routes
 import com.pandaapps.medicalstoremangementsystem.R
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 
 
 @Composable
-fun SignUpScreen(viewModel: ViewModel, navController: NavController) {
+fun SignUpScreen(viewModelApp: ViewModelApp, navController: NavController) {
 
 
     var name by remember { mutableStateOf("") }
@@ -246,7 +246,7 @@ fun SignUpScreen(viewModel: ViewModel, navController: NavController) {
                 }
 
                 if (!hasError) {
-                    viewModel.createUser(
+                    viewModelApp.createUser(
                         name = name,
                         password = password,
                         email = email,
@@ -268,7 +268,7 @@ fun SignUpScreen(viewModel: ViewModel, navController: NavController) {
 
         Row(
             modifier = Modifier.fillMaxWidth().clickable {
-                navController.navigate(NavScreens.LoginPageHolder)
+                navController.navigate(Routes.LoginPageHolder)
             },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,

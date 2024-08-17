@@ -2,18 +2,27 @@ package com.pandaapps.medicalstoremangementsystem.Navigation
 
 import kotlinx.serialization.Serializable
 
-sealed class NavScreens {
+sealed class Routes {
 
     @Serializable
-    object SignUpHolder
+    data object SignUpHolder : Routes()
 
     @Serializable
-    object LoginPageHolder
+    data object LoginPageHolder : Routes()
 
     @Serializable
-    object HomeHolder
+    data object HomeHolder : Routes()
 
     @Serializable
-    object PlaceOrder
+    data object PlaceOrder : Routes()
+
+    @Serializable
+    data object HomeContent : Routes()
+
+    @Serializable
+    data object Orders: Routes()
+
+    @Serializable
+    data object Profile:Routes()
 
 }

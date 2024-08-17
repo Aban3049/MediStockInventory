@@ -1,7 +1,7 @@
 package com.pandaapps.medicalstoremangementsystem.Screens.LogIn
 
 import android.os.Build
-import androidx.compose.foundation.Image
+import androidx.annotation.RawRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -31,40 +33,59 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.pandaapps.medicalstoremangementsystem.Navigation.NavScreens
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
+import app.rive.runtime.kotlin.RiveAnimationView
+import app.rive.runtime.kotlin.core.ExperimentalAssetLoader
+import app.rive.runtime.kotlin.core.Fit
+import com.pandaapps.medicalstoremangementsystem.Navigation.Routes
 import com.pandaapps.medicalstoremangementsystem.R
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.HeaderText
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextField
+import com.pandaapps.medicalstoremangementsystem.Screens.Components.TextFieldPassword
 import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
 import com.pandaapps.medicalstoremangementsystem.States.State
 import com.pandaapps.medicalstoremangementsystem.ViewModel.UserViewModel
-import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModel
+import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 
 
+@OptIn(ExperimentalAssetLoader::class)
 @Composable
 
 fun LogIn(
-    navController: NavController,
-    viewModel: ViewModel,
+    navHostController: NavHostController,
+    viewModelApp: ViewModelApp,
     userViewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-
 
     var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
 
     var passwordError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
+
+    val passwordVisibility = remember {
+        mutableStateOf(false)
+    }
+
+    val isChecking = remember {
+        mutableStateOf(false)
+    }
+
+    val trigFailed = remember {
+        mutableStateOf(false)
+    }
+
+    val trigSuccess = remember {
+        mutableStateOf(false)
+    }
 
     var isChecked by remember { mutableStateOf(false) }
 
@@ -84,7 +105,7 @@ fun LogIn(
     val contentPadding = 16.dp
     val spacing = 8.dp
 
-    when (viewModel.state.value) {
+    when (viewModelApp.state.value) {
 
         State.Default.stateType -> {
             Column(
@@ -103,11 +124,35 @@ fun LogIn(
 
                 Spacer(modifier = Modifier.height(spacing))
 
-                Image(
-                    painterResource(id = R.drawable.assistance),
-                    contentDescription = "Logo Image",
-                    modifier = Modifier.size(150.dp)
-                )
+                ComposableRiveAnimationView(
+                    animation = R.raw.logincharacter,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .fillMaxWidth()
+                ) {
+                    it.setBooleanState(
+                        "Login Machine",
+                        "isHandsUp", passwordVisibility.value
+                    )
+
+                    it.setBooleanState("Login Machine", "isChecking", isChecking.value)
+
+                    if (trigFailed.value) {
+                        it.fireState("Login Machine", "trigFail")
+                    }
+
+                    if (trigSuccess.value) {
+                        it.fireState("Login Machine", "trigSuccess")
+                    }
+
+                }
+
+//                Image(
+//                    painterResource(id = R.drawable.assistance),
+//                    contentDescription = "Logo Image",
+//                    modifier = Modifier.size(150.dp)
+//                )
+
 
                 Spacer(modifier = Modifier.height(8.dp + 6.dp))
 
@@ -122,7 +167,10 @@ fun LogIn(
 
                 TextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = {
+                        email = it
+                        isChecking.value = true
+                    },
                     labelText = "Email",
                     leadingIcon = Icons.Default.Email,
                     keyboardType = KeyboardType.Email,
@@ -131,14 +179,21 @@ fun LogIn(
 
                 Spacer(modifier = Modifier.height(spacing + 2.dp))
 
-                TextField(
+                TextFieldPassword(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        isChecking.value = true
+                    },
                     labelText = "Password",
                     leadingIcon = Icons.Default.Lock,
                     keyboardType = KeyboardType.Password,
-                    visualTransformation = PasswordVisualTransformation(),
-                    error = passwordError
+                    error = passwordError,
+                    passwordVisibility = passwordVisibility.value,
+                    onClick = {
+                        passwordVisibility.value = !passwordVisibility.value
+                    },
+                    Icon = if (passwordVisibility.value) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 )
 
                 Spacer(modifier = Modifier.height(spacing))
@@ -186,9 +241,14 @@ fun LogIn(
                         }
 
                         if (!hasError) {
-                            viewModel.logInUser(email = email, password = password)
+                            viewModelApp.getId(email, password)
+                            viewModelApp.logInUser(email = email, password = password)
+                            trigSuccess.value = true
 
+                        } else {
+                            trigFailed.value = true
                         }
+
 
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
@@ -203,7 +263,7 @@ fun LogIn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            navController.navigate(NavScreens.SignUpHolder)
+                            navHostController.navigate(Routes.SignUpHolder)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -227,11 +287,11 @@ fun LogIn(
         }
 
         State.SUCESS.stateType -> {
-            navController.navigate(NavScreens.HomeHolder)
+            navHostController.navigate(Routes.HomeHolder)
         }
 
         State.FAILED.stateType -> {
-            viewModel.failedSetToDefault()
+            viewModelApp.failedOrSuccessSetToDefault()
         }
 
 
@@ -239,4 +299,33 @@ fun LogIn(
 
 
 }
+
+@OptIn(ExperimentalAssetLoader::class)
+@Composable
+fun ComposableRiveAnimationView(
+    modifier: Modifier = Modifier,
+    @RawRes animation: Int,
+    stateMachineName: String? = null,
+    alignment: app.rive.runtime.kotlin.core.Alignment = app.rive.runtime.kotlin.core.Alignment.CENTER,
+    fit: Fit = Fit.CONTAIN,
+    onInit: (RiveAnimationView) -> Unit = {}
+) {
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            RiveAnimationView(context).also {
+                it.setRiveResource(
+                    resId = animation,
+                    stateMachineName = stateMachineName,
+                    alignment = alignment,
+                    fit = fit,
+
+                    )
+            }
+        },
+        update = { view -> onInit(view) }
+    )
+}
+
+
 

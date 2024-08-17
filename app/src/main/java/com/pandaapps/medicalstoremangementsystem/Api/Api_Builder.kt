@@ -32,6 +32,20 @@ interface Api_Builder {
         @Field("password") password: String
     ): Response<loginResponse>
 
+    @FormUrlEncoded
+    @POST("/getId")
+    suspend fun getId(
+        @Field("email") email: String,
+        @Field("password") password: String
+    ): Response<getIdResponse>
+
+    @FormUrlEncoded
+    @POST("/addOrder")
+    suspend fun placeOrder(
+        @Field("productId") productId: Int,
+        @Field("productQuantity") productQuantity: Int,
+        @Field("vendorId") vendorId: Int
+    ): Response<OrderResponse>
 
 
     companion object {
