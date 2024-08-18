@@ -18,6 +18,7 @@ lifecycleViewmodelCompose = "2.8.1"
 material = "1.6.8"
 navigationCompose = "2.8.0-beta03"
 retrofit = "2.11.0"
+runtimeLivedata = "1.6.8"
 
 [libraries]
 androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
@@ -44,6 +45,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

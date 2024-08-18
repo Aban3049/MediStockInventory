@@ -12,12 +12,13 @@ import com.pandaapps.medicalstoremangementsystem.Screens.Dashboard.Dashboard
 import com.pandaapps.medicalstoremangementsystem.Screens.LogIn.LogIn
 import com.pandaapps.medicalstoremangementsystem.Screens.OrderPlace.PlaceOrder
 import com.pandaapps.medicalstoremangementsystem.Screens.SignUp.SignUp
+import com.pandaapps.medicalstoremangementsystem.ViewModel.UserViewModel
 import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun Navigation(viewModelApp: ViewModelApp) {
+fun Navigation(userViewModel: UserViewModel,viewModelApp: ViewModelApp) {
 
     val navController = rememberNavController()
 
@@ -33,15 +34,15 @@ fun Navigation(viewModelApp: ViewModelApp) {
         }
 
         composable<Routes.LoginPageHolder> {
-            LogIn(navController,viewModelApp)
+            LogIn(navController,viewModelApp,userViewModel)
         }
 
         composable<Routes.HomeHolder> {
-            Dashboard(navController)
+            Dashboard(userViewModel,navController)
         }
 
         composable<Routes.PlaceOrder> {
-            PlaceOrder(viewModelApp)
+            PlaceOrder(viewModelApp,userViewModel)
         }
 
 

@@ -30,11 +30,12 @@ import com.pandaapps.medicalstoremangementsystem.Screens.BottomBar.Cart
 import com.pandaapps.medicalstoremangementsystem.Screens.BottomBar.HomeContent
 import com.pandaapps.medicalstoremangementsystem.Screens.BottomBar.Profile
 import com.pandaapps.medicalstoremangementsystem.Screens.Components.list
+import com.pandaapps.medicalstoremangementsystem.ViewModel.UserViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboard(navHostController: NavHostController) {
+fun Dashboard(userViewModel: UserViewModel, navHostController: NavHostController) {
 
     val context = LocalContext.current
 
@@ -89,7 +90,7 @@ fun Dashboard(navHostController: NavHostController) {
                 }
 
                 composable<Routes.Orders> {
-                    Cart()
+                    Cart(userViewModel)
                 }
 
             }

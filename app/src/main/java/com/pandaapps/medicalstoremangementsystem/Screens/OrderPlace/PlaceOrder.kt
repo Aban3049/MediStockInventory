@@ -59,7 +59,7 @@ import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 @Composable
 fun PlaceOrder(
     viewModelApp: ViewModelApp,
-    userViewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    userViewModel: UserViewModel
 ) {
 
     val allProducts by viewModelApp.allProducts.collectAsState(initial = emptyList())

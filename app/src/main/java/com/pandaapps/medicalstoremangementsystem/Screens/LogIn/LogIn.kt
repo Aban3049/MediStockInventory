@@ -62,7 +62,7 @@ import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 fun LogIn(
     navHostController: NavHostController,
     viewModelApp: ViewModelApp,
-    userViewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    userViewModel: UserViewModel
 ) {
 
     var password by remember { mutableStateOf("") }

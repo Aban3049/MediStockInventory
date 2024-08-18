@@ -47,6 +47,12 @@ interface Api_Builder {
         @Field("vendorId") vendorId: Int
     ): Response<OrderResponse>
 
+    @FormUrlEncoded
+    @POST("getOrdersByVendorId")
+    suspend fun getVendorOrders(
+        @Field("vendorId") vendorId: Int
+    ): Response<GetOrdersResponse>
+
 
     companion object {
         const val BASE_URL = "http://muhammadaban.pythonanywhere.com"
