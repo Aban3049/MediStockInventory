@@ -26,13 +26,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -99,14 +99,37 @@ fun Profile() {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
+                .fillMaxWidth()
+                .padding()
+                .offset(y = (-70).dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
-           Row(modifier = Modifier.fillMaxWidth()) {
-               Icon(imageVector = Icons.Default.Person2, contentDescription = null)
-           }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person2,
+                    contentDescription = null,
+                    Modifier
+                        .size(34.dp)
+                        .weight(.5f),
+                    tint = Color(0xFF6956F0),
+                )
+                Text(
+                    text = "Muhammad Aban",
+                    color = Color(0xFFA1A1A1),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 4.dp),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    )
+            }
+            
+            Spacer(modifier = Modifier.height(2.dp).background(Color(0xFFA1A1A1)))
 
         }
 
