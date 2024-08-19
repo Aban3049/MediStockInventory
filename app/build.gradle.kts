@@ -74,7 +74,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.material)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.runtime.compose)

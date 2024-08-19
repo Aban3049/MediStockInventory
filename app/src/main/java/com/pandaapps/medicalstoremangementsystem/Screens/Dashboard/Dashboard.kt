@@ -4,8 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,18 +46,18 @@ fun Dashboard(userViewModel: UserViewModel, navHostController: NavHostController
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = {
-                Text(text = "MediStock Manager")
-            }, navigationIcon = {
-                IconButton(onClick = { navHostController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "back-btn"
-                    )
-                }
-            })
-        },
+//        topBar = {
+//            TopAppBar(title = {
+//                Text(text = "MediStock Manager")
+//            }, navigationIcon = {
+//                IconButton(onClick = { navHostController.popBackStack() }) {
+//                    Icon(
+//                        imageVector = Icons.Default.ArrowBackIosNew,
+//                        contentDescription = "back-btn"
+//                    )
+//                }
+//            }, modifier = Modifier.height(55.dp))
+//        },
         bottomBar = {
             NavigationBar(modifier = Modifier.height(55.dp)) {
                 list.fastForEachIndexed { index, item ->
@@ -78,9 +78,9 @@ fun Dashboard(userViewModel: UserViewModel, navHostController: NavHostController
 
     ) {
 
-        Column(Modifier.padding(it)) {
 
-            NavHost(startDestination = Routes.HomeHolder, navController = navController) {
+
+            NavHost(startDestination = Routes.HomeHolder, navController = navController, modifier = Modifier.padding(it)) {
 
                 composable<Routes.HomeHolder> {
                     HomeContent(navHostController)
@@ -95,7 +95,7 @@ fun Dashboard(userViewModel: UserViewModel, navHostController: NavHostController
 
             }
 
-        }
+
 
     }
 

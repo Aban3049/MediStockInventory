@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
 
     private val client: OkHttpClient = OkHttpClient.Builder().build()
-
     val api: Api_Builder =
         Retrofit.Builder()
             .client(client)
