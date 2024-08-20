@@ -4,37 +4,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import com.pandaapps.medicalstoremangementsystem.Navigation.Routes
-import com.pandaapps.medicalstoremangementsystem.R
 import com.pandaapps.medicalstoremangementsystem.Screens.DialogBoxWithProgressIndicator
-import com.pandaapps.medicalstoremangementsystem.Screens.DialogWithImage
 import com.pandaapps.medicalstoremangementsystem.States.State
 import com.pandaapps.medicalstoremangementsystem.ViewModel.ViewModelApp
 
-
-
 @Composable
-fun SignUp(viewModelApp: ViewModelApp, navHostController: NavHostController) {
+fun SignUp(viewModelApp: ViewModelApp, navController: NavHostController) {
+    val state by viewModelApp.state.collectAsState()
 
-
-    when (viewModelApp.state.value) {
-
+    when (state) {
         State.Default.stateType -> {
-            SignUpScreen(viewModelApp = viewModelApp, navController = navHostController)
-
+            SignUpScreen(viewModelApp, navController)
         }
 
         State.LOADING.stateType -> {
-
-
-            SignUpScreen(viewModelApp = viewModelApp, navController = navHostController)
-
-
-
+            SignUpScreen(viewModelApp, navController)
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -43,43 +34,24 @@ fun SignUp(viewModelApp: ViewModelApp, navHostController: NavHostController) {
                 DialogBoxWithProgressIndicator(text = "Creating Account")
             }
 
-
         }
 
         State.FAILED.stateType -> {
-
-
-            SignUpScreen(viewModelApp = viewModelApp, navController = navHostController)
-
-
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DialogWithImage(
-                    onDismissRequest = { viewModelApp.failedOrSuccessSetToDefault() },
-                    onConfirmation = { viewModelApp.state.value = State.Default.stateType },
-                    painter = painterResource(id = R.drawable.angry),
-                    imageDescription = "angryEmoji",
-                    "Failed to Create Account",
-                )
-            }
-
+            SignUpScreen(viewModelApp, navController)
 
         }
 
         State.SUCESS.stateType -> {
-            navHostController.navigate(Routes.HomeHolder)
-
+            LaunchedEffect(Unit) {
+                navController.navigate(Routes.HomeHolder) {
+                    popUpTo(Routes.SignUpHolder) { inclusive = true }
+                }
+            }
         }
-
-
     }
-
-
 }
+
+
 
 
 

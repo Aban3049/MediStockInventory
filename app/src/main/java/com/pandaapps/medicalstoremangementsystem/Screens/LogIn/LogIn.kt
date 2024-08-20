@@ -26,6 +26,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,6 +89,8 @@ fun LogIn(
         mutableStateOf(false)
     }
 
+    val state by viewModelApp.state.collectAsState()
+
     var isChecked by remember { mutableStateOf(false) }
 
     val customFontFamily = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -95,9 +99,7 @@ fun LogIn(
             Font(R.font.poppinsbold, FontWeight.Bold),
             Font(R.font.poppinsextrabold, FontWeight.ExtraBold),
             Font(R.font.poppinsextrabolditalic, FontWeight.Bold),
-
-
-            )
+        )
     } else {
         FontFamily.Default
     }
@@ -105,197 +107,385 @@ fun LogIn(
     val contentPadding = 16.dp
     val spacing = 8.dp
 
-    when (viewModelApp.state.value) {
-
-        State.Default.stateType -> {
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                HeaderText(
-                    text = "LogIn",
-                    fontFamily = customFontFamily,
-                    textAlign = TextAlign.Start
-                )
-
-                Spacer(modifier = Modifier.height(spacing))
-
-                ComposableRiveAnimationView(
-                    animation = R.raw.logincharacter,
-                    modifier = Modifier
-                        .size(300.dp)
-                        .fillMaxWidth()
-                ) {
-                    it.setBooleanState(
-                        "Login Machine",
-                        "isHandsUp", passwordVisibility.value
-                    )
-
-                    it.setBooleanState("Login Machine", "isChecking", isChecking.value)
-
-                    if (trigFailed.value) {
-                        it.fireState("Login Machine", "trigFail")
-                    }
-
-                    if (trigSuccess.value) {
-                        it.fireState("Login Machine", "trigSuccess")
-                    }
-
+    LaunchedEffect(state) {
+        when (state) {
+            State.SUCESS.stateType -> {
+                navHostController.navigate(Routes.HomeHolder) {
+                    popUpTo(Routes.LoginPageHolder) { inclusive = true }
                 }
-
-//                Image(
-//                    painterResource(id = R.drawable.assistance),
-//                    contentDescription = "Logo Image",
-//                    modifier = Modifier.size(150.dp)
-//                )
-
-
-                Spacer(modifier = Modifier.height(8.dp + 6.dp))
-
-                Text(
-                    "Welcome To MediStock Manager ",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-
-                Spacer(modifier = Modifier.height(spacing))
-
-                TextField(
-                    value = email,
-                    onValueChange = {
-                        email = it
-                        isChecking.value = true
-                    },
-                    labelText = "Email",
-                    leadingIcon = Icons.Default.Email,
-                    keyboardType = KeyboardType.Email,
-                    error = emailError
-                )
-
-                Spacer(modifier = Modifier.height(spacing + 2.dp))
-
-                TextFieldPassword(
-                    value = password,
-                    onValueChange = {
-                        password = it
-                        isChecking.value = true
-                    },
-                    labelText = "Password",
-                    leadingIcon = Icons.Default.Lock,
-                    keyboardType = KeyboardType.Password,
-                    error = passwordError,
-                    passwordVisibility = passwordVisibility.value,
-                    onClick = {
-                        passwordVisibility.value = !passwordVisibility.value
-                    },
-                    Icon = if (passwordVisibility.value) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                )
-
-                Spacer(modifier = Modifier.height(spacing))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-
-                    Checkbox(
-                        checked = isChecked,
-                        onCheckedChange = {
-                            isChecked = it
-                            userViewModel.saveUserCredentials(email, password)
-                        }
-                    )
-                    Text(
-                        text = if (isChecked) "Remembered" else "Remember Me",
-                        modifier = Modifier.padding(top = 10.dp, start = 4.dp)
-                    )
-
-                }
-
-                Spacer(modifier = Modifier.height(spacing + 9.dp))
-
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    onClick = {
-
-                        var hasError = false
-
-                        if (password.isBlank()) {
-                            passwordError = "Password cannot be empty"
-                            hasError = true
-                        } else {
-                            passwordError = null
-                        }
-
-                        if (email.isBlank()) {
-                            emailError = "Email cannot be empty"
-                            hasError = true
-                        } else {
-                            emailError = null
-                        }
-
-                        if (!hasError) {
-                            viewModelApp.getId(email, password)
-                            viewModelApp.logInUser(email = email, password = password)
-                            trigSuccess.value = true
-
-                        } else {
-                            trigFailed.value = true
-                        }
-
-
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text("LogIn", color = Color.White, fontSize = 17.sp)
-                }
-
-                Spacer(modifier = Modifier.height(spacing + 6.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navHostController.navigate(Routes.SignUpHolder)
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "Don't have an account?")
-
-                    Text(text = " Sign Up")
-                }
-
             }
-        }
-
-        State.LOADING.stateType -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DialogBoxWithProgressIndicator(text = "Loging In Account ...")
+            State.FAILED.stateType -> {
+                viewModelApp.failedOrSuccessSetToDefault()
             }
+            else -> {}
         }
-
-        State.SUCESS.stateType -> {
-            navHostController.navigate(Routes.HomeHolder)
-        }
-
-        State.FAILED.stateType -> {
-            viewModelApp.failedOrSuccessSetToDefault()
-        }
-
-
     }
+
+    Column(
+        modifier = Modifier
+            .padding(contentPadding)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (state == State.LOADING.stateType) {
+            DialogBoxWithProgressIndicator(text = "Logging In Account ...")
+        } else {
+            HeaderText(
+                text = "LogIn",
+                fontFamily = customFontFamily,
+                textAlign = TextAlign.Start
+            )
+
+            Spacer(modifier = Modifier.height(spacing))
+
+            ComposableRiveAnimationView(
+                animation = R.raw.logincharacter,
+                modifier = Modifier
+                    .size(300.dp)
+                    .fillMaxWidth()
+            ) {
+                it.setBooleanState(
+                    "Login Machine",
+                    "isHandsUp", passwordVisibility.value
+                )
+                it.setBooleanState("Login Machine", "isChecking", isChecking.value)
+
+                if (trigFailed.value) {
+                    it.fireState("Login Machine", "trigFail")
+                }
+
+                if (trigSuccess.value) {
+                    it.fireState("Login Machine", "trigSuccess")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp + 6.dp))
+
+            Text(
+                "Welcome To MediStock Manager ",
+                style = MaterialTheme.typography.headlineLarge,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            Spacer(modifier = Modifier.height(spacing))
+
+            TextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                    isChecking.value = true
+                },
+                labelText = "Email",
+                leadingIcon = Icons.Default.Email,
+                keyboardType = KeyboardType.Email,
+                error = emailError
+            )
+
+            Spacer(modifier = Modifier.height(spacing + 2.dp))
+
+            TextFieldPassword(
+                value = password,
+                onValueChange = {
+                    password = it
+                    isChecking.value = true
+                },
+                labelText = "Password",
+                leadingIcon = Icons.Default.Lock,
+                keyboardType = KeyboardType.Password,
+                error = passwordError,
+                passwordVisibility = passwordVisibility.value,
+                onClick = {
+                    passwordVisibility.value = !passwordVisibility.value
+                },
+                Icon = if (passwordVisibility.value) Icons.Default.Visibility else Icons.Default.VisibilityOff
+            )
+
+            Spacer(modifier = Modifier.height(spacing))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = {
+                        isChecked = it
+                        userViewModel.saveUserCredentials(email, password)
+                    }
+                )
+                Text(
+                    text = if (isChecked) "Remembered" else "Remember Me",
+                    modifier = Modifier.padding(top = 10.dp, start = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(spacing + 9.dp))
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                onClick = {
+                    var hasError = false
+
+                    if (password.isBlank()) {
+                        passwordError = "Password cannot be empty"
+                        hasError = true
+                    } else {
+                        passwordError = null
+                    }
+
+                    if (email.isBlank()) {
+                        emailError = "Email cannot be empty"
+                        hasError = true
+                    } else {
+                        emailError = null
+                    }
+
+                    if (!hasError) {
+                        viewModelApp.getId(email, password)
+                        viewModelApp.logInUser(email = email, password = password)
+                        trigSuccess.value = true
+                    } else {
+                        trigFailed.value = true
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("LogIn", color = Color.White, fontSize = 17.sp)
+            }
+
+            Spacer(modifier = Modifier.height(spacing + 6.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navHostController.navigate(Routes.SignUpHolder)
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Don't have an account?")
+                Text(text = " Sign Up")
+            }
+        }
+    }
+
+
+//    val state = viewModelApp.state.collectAsState()
+//
+//    var isChecked by remember { mutableStateOf(false) }
+//
+//    val customFontFamily = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//        FontFamily(
+//            Font(R.font.poppinsblack, FontWeight.Normal),
+//            Font(R.font.poppinsbold, FontWeight.Bold),
+//            Font(R.font.poppinsextrabold, FontWeight.ExtraBold),
+//            Font(R.font.poppinsextrabolditalic, FontWeight.Bold),
+//
+//
+//            )
+//    } else {
+//        FontFamily.Default
+//    }
+//
+//    val contentPadding = 16.dp
+//    val spacing = 8.dp
+//
+//    when (state.value) {
+//
+//        State.Default.stateType -> {
+//            Column(
+//                modifier = Modifier
+//                    .padding(contentPadding)
+//                    .fillMaxSize()
+//                    .verticalScroll(rememberScrollState()),
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//
+//                HeaderText(
+//                    text = "LogIn",
+//                    fontFamily = customFontFamily,
+//                    textAlign = TextAlign.Start
+//                )
+//
+//                Spacer(modifier = Modifier.height(spacing))
+//
+//                ComposableRiveAnimationView(
+//                    animation = R.raw.logincharacter,
+//                    modifier = Modifier
+//                        .size(300.dp)
+//                        .fillMaxWidth()
+//                ) {
+//                    it.setBooleanState(
+//                        "Login Machine",
+//                        "isHandsUp", passwordVisibility.value
+//                    )
+//
+//                    it.setBooleanState("Login Machine", "isChecking", isChecking.value)
+//
+//                    if (trigFailed.value) {
+//                        it.fireState("Login Machine", "trigFail")
+//                    }
+//
+//                    if (trigSuccess.value) {
+//                        it.fireState("Login Machine", "trigSuccess")
+//                    }
+//
+//                }
+//
+////                Image(
+////                    painterResource(id = R.drawable.assistance),
+////                    contentDescription = "Logo Image",
+////                    modifier = Modifier.size(150.dp)
+////                )
+//
+//
+//                Spacer(modifier = Modifier.height(8.dp + 6.dp))
+//
+//                Text(
+//                    "Welcome To MediStock Manager ",
+//                    style = MaterialTheme.typography.headlineLarge,
+//                    fontSize = 22.sp,
+//                    fontWeight = FontWeight.ExtraBold
+//                )
+//
+//                Spacer(modifier = Modifier.height(spacing))
+//
+//                TextField(
+//                    value = email,
+//                    onValueChange = {
+//                        email = it
+//                        isChecking.value = true
+//                    },
+//                    labelText = "Email",
+//                    leadingIcon = Icons.Default.Email,
+//                    keyboardType = KeyboardType.Email,
+//                    error = emailError
+//                )
+//
+//                Spacer(modifier = Modifier.height(spacing + 2.dp))
+//
+//                TextFieldPassword(
+//                    value = password,
+//                    onValueChange = {
+//                        password = it
+//                        isChecking.value = true
+//                    },
+//                    labelText = "Password",
+//                    leadingIcon = Icons.Default.Lock,
+//                    keyboardType = KeyboardType.Password,
+//                    error = passwordError,
+//                    passwordVisibility = passwordVisibility.value,
+//                    onClick = {
+//                        passwordVisibility.value = !passwordVisibility.value
+//                    },
+//                    Icon = if (passwordVisibility.value) Icons.Default.Visibility else Icons.Default.VisibilityOff
+//                )
+//
+//                Spacer(modifier = Modifier.height(spacing))
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                ) {
+//
+//                    Checkbox(
+//                        checked = isChecked,
+//                        onCheckedChange = {
+//                            isChecked = it
+//                            userViewModel.saveUserCredentials(email, password)
+//                        }
+//                    )
+//                    Text(
+//                        text = if (isChecked) "Remembered" else "Remember Me",
+//                        modifier = Modifier.padding(top = 10.dp, start = 4.dp)
+//                    )
+//
+//                }
+//
+//                Spacer(modifier = Modifier.height(spacing + 9.dp))
+//
+//                Button(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(48.dp),
+//                    onClick = {
+//
+//                        var hasError = false
+//
+//                        if (password.isBlank()) {
+//                            passwordError = "Password cannot be empty"
+//                            hasError = true
+//                        } else {
+//                            passwordError = null
+//                        }
+//
+//                        if (email.isBlank()) {
+//                            emailError = "Email cannot be empty"
+//                            hasError = true
+//                        } else {
+//                            emailError = null
+//                        }
+//
+//                        if (!hasError) {
+//                            viewModelApp.getId(email, password)
+//                            viewModelApp.logInUser(email = email, password = password)
+//                            trigSuccess.value = true
+//
+//                        } else {
+//                            trigFailed.value = true
+//                        }
+//
+//
+//                    },
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF011936)),
+//                    shape = RoundedCornerShape(10.dp)
+//                ) {
+//                    Text("LogIn", color = Color.White, fontSize = 17.sp)
+//                }
+//
+//                Spacer(modifier = Modifier.height(spacing + 6.dp))
+//
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable {
+//                            navHostController.navigate(Routes.SignUpHolder)
+//                        },
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    Text(text = "Don't have an account?")
+//
+//                    Text(text = " Sign Up")
+//                }
+//
+//            }
+//        }
+//
+//        State.LOADING.stateType -> {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                DialogBoxWithProgressIndicator(text = "Loging In Account ...")
+//            }
+//        }
+//
+//        State.SUCESS.stateType -> {
+//            navHostController.navigate(Routes.HomeHolder)
+//        }
+//
+//        State.FAILED.stateType -> {
+//            viewModelApp.failedOrSuccessSetToDefault()
+//        }
+//
+//
+//    }
 
 
 }

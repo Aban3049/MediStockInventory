@@ -2,9 +2,9 @@ package com.pandaapps.medicalstoremangementsystem.States
 
 sealed class State(var stateType: String) {
 
-    object Default : State("Default")
-    object LOADING : State("LOADING")
-    object SUCESS : State("SUCESS")
-    object FAILED : State("FAILED")
+    data object Default : State("Default")
+    data object LOADING : State("LOADING")
+    data object SUCESS : State("SUCESS")
+    data object FAILED : State("FAILED")
 
 }

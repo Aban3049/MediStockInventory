@@ -13,30 +13,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
 class ViewModelApp(private val application: Application) : ViewModel() {
 
-    var state = mutableStateOf("")
+    private val _state = MutableStateFlow(State.Default.stateType)
+    val state: StateFlow<String> = _state
 
+    private val _allProducts = MutableStateFlow<List<ProductResponse.ProductResponseItem>>(emptyList())
+    val allProducts: StateFlow<List<ProductResponse.ProductResponseItem>> = _allProducts.asStateFlow()
 
-    private val _allProducts =
-        MutableStateFlow<List<ProductResponse.ProductResponseItem>>(emptyList())
-    val allProducts: StateFlow<List<ProductResponse.ProductResponseItem>> =
-        _allProducts.asStateFlow()
-
-    val id = MutableStateFlow<Int>(0)
-
+    val id = MutableStateFlow(0)
 
     init {
-        state.value = State.Default.stateType
+        _state.value = State.Default.stateType
         viewModelScope.launch {
             val response = RetrofitInstance.api.getAllProducts()
             _allProducts.value = response
         }
-
-
     }
-
 
     fun createUser(
         name: String,
@@ -46,8 +39,7 @@ class ViewModelApp(private val application: Application) : ViewModel() {
         address: String,
         pinCode: String
     ) {
-        state.value = State.LOADING.stateType
-
+        _state.value = State.LOADING.stateType
 
         viewModelScope.launch {
             val result = RetrofitInstance.api.createUser(
@@ -59,119 +51,70 @@ class ViewModelApp(private val application: Application) : ViewModel() {
                 pinCode = pinCode
             )
 
-            if (result.isSuccessful == true) {
-
-                if (result.body()?.success == 200) {
-                    state.value = State.SUCESS.stateType
-                }
-
-
+            if (result.isSuccessful && result.body()?.success == 200) {
+                _state.value = State.SUCESS.stateType
             } else {
-                state.value = State.FAILED.stateType
+                _state.value = State.FAILED.stateType
             }
-
         }
-
     }
 
-    fun getId(
-        email: String,
-        password: String
-    ) {
+    fun getId(email: String, password: String) {
         viewModelScope.launch {
             val result = RetrofitInstance.api.getId(email = email, password = password)
 
-            if (result.isSuccessful) {
-
-                if (result.body()?.id != null) {
-                    state.value = State.SUCESS.stateType
-                    id.value = result.body()!!.id!!
-                    UserViewModel(application = application).saveUserId(id.value)
-                    Log.d("ID", "getId: ${id.value}")
-                }
-
+            if (result.isSuccessful && result.body()?.id != null) {
+                id.value = result.body()!!.id!!
+                UserViewModel(application = application).saveUserId(id.value)
+                Log.d("ID", "getId: ${id.value}")
+                _state.value = State.SUCESS.stateType
             } else {
-
-                state.value = State.FAILED.stateType
-
-                Log.d(
-                    "LogIn",
-                    "logInUser: ${result.body()?.id} message :${result.body()?.id} "
-                )
-
+                _state.value = State.FAILED.stateType
+                Log.d("LogIn", "logInUser: ${result.body()?.id} message :${result.body()?.id}")
             }
-
         }
-
     }
 
-    fun placeOrder(
-        productId: Int,
-        productQuantity: Int,
-        vendorId: Int
-    ) {
-        state.value = State.LOADING.stateType
+    fun logInUser(email: String, password: String) {
+        _state.value = State.LOADING.stateType
 
         viewModelScope.launch {
+            val result = RetrofitInstance.api.loginUser(email = email, password = password)
 
+            if (result.isSuccessful && result.body()?.status == 200) {
+                _state.value = State.SUCESS.stateType
+                Log.d("LogIn", "logInUser: ${result.body()?.message}")
+            } else {
+                _state.value = State.FAILED.stateType
+                Log.d("LogIn", "logInUser: ${result.body()?.status} message :${result.body()?.message}")
+            }
+        }
+    }
+
+    fun placeOrder(productId: Int, productQuantity: Int, vendorId: Int) {
+        _state.value = State.LOADING.stateType
+
+        viewModelScope.launch {
             val result = RetrofitInstance.api.placeOrder(
                 productId = productId,
                 productQuantity = productQuantity,
                 vendorId = vendorId
             )
 
-            if (result.isSuccessful == true) {
-
-                if (result.body()?.status == 200) {
-                    state.value = State.SUCESS.stateType
-                    Log.d("LogIn", "logInUser: ${result.body()?.message} ")
-
-                } else {
-                    state.value = State.FAILED.stateType
-                    Log.d("LogIn", "logInUser: ${result.body()?.message} ")
-
-                }
-            }
-
-        }
-
-    }
-
-    fun logInUser(
-        email: String,
-        password: String
-    ) {
-        state.value = State.LOADING.stateType
-
-        viewModelScope.launch {
-            val result = RetrofitInstance.api.loginUser(email = email, password = password)
-
-            if (result.isSuccessful == true) {
-
-                if (result.body()?.status == 200) {
-                    state.value = State.SUCESS.stateType
-                    Log.d("LogIn", "logInUser: ${result.body()?.message} ")
-
-                }
+            if (result.isSuccessful && result.body()?.status == 200) {
+                _state.value = State.SUCESS.stateType
+                Log.d("LogIn", "logInUser: ${result.body()?.message}")
             } else {
-
-                state.value = State.FAILED.stateType
-
-                Log.d(
-                    "LogIn",
-                    "logInUser: ${result.body()?.status} message :${result.body()?.message} "
-                )
-
+                _state.value = State.FAILED.stateType
+                Log.d("LogIn", "logInUser: ${result.body()?.message}")
             }
-
         }
-
     }
-
 
     fun failedOrSuccessSetToDefault() {
-        state.value = State.Default.stateType
+        _state.value = State.Default.stateType
     }
-
-
 }
+
+
+
